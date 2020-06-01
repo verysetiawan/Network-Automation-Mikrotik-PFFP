@@ -1,0 +1,12 @@
+<html>
+    <head></head>
+    <body>
+        <h1>DAFTAR IP ADDRESS</h1>
+        <p>IP ADDRESS YANG TERDAFTAR YAITU : </p>
+        <div>
+            {% for ip in var%}         <!--sintaks jinja2 memulai for-->
+                <li>{{ip}}</li>    <!--memanggil nilai variabel ip-->
+            {% endfor %}                    <!--sintaks jinja2 mengakhiri for-->
+        </div>
+    </body>
+</html>
