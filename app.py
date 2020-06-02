@@ -9,11 +9,10 @@ app = Flask(__name__,template_folder='template')
 def config():
     #menangkap ip mikrotik client
     data = request.get_json()
-    data2 = request.get_json()
     ip_mik = data["ip_router"]
     username = "admin"
     password = ""
-    ip_gate = data2["ip_gateway"]
+    ip_gate = data["ip_gateway"]
 
     # Cetak ip Mikrotik
     print (f"IP Address Mikrotik adalah : {ip_mik}")
