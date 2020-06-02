@@ -10,6 +10,9 @@ def config():
     #menangkap ip mikrotik client
     data = request.get_json()
     ip_mik = data["ip_router"]
+    username = "admin"
+    password = ""
+    
 
     # Cetak ip Mikrotik
     print (f"IP Address Mikrotik adalah : {ip_mik}")
@@ -20,6 +23,12 @@ def config():
     file_write.write ("\n")
     file_write.close()
 
+    #perintah untuk melakukan koneksi ssh client ke mikrotik
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(hostname=ip_mik,username=username,password=password)
+    print (f"sukses login to {ip_mik}")
+    ssh_client.exec_command(f"/system identity set name=R-{ip_mik}")
     return jsonify(data)
 
 @app.route("/")
