@@ -9,13 +9,16 @@ app = Flask(__name__,template_folder='template')
 def config():
     #menangkap ip mikrotik client
     data = request.get_json()
+    data2 = request.get_json()
     ip_mik = data["ip_router"]
     username = "admin"
     password = ""
-    
+    ip_gate = data2["ip_gateway"]
 
     # Cetak ip Mikrotik
     print (f"IP Address Mikrotik adalah : {ip_mik}")
+    print (f"IP Gateway Router Klien Mikrotik adalah : {ip_gate[:13]}")
+    print (f"host id nya adalah: {ip_mik[12:]}")
 
     #Menyimpan informasi ip ke file ip_address.txt
     file_write = open ("template/ip_address.txt","a")
@@ -30,16 +33,17 @@ def config():
     print (f"sukses login to {ip_mik}")
     
     #Perintah konfigurasi router klien
+     
     config_list = [
         f"/system identity set name=R-{ip_mik}",
         "/tool romon set enabled=yes secrets=kangphery",
         "ip service disable telnet,ftp,www,api-ssl",
-        "/ip dns set servers=192.168.100.1",
-        "/ip address add address=172.16.7.1/24 interface=ether2 network=172.16.7.0",
+        f"/ip dns set servers={ip_gate[:13]}",
+        f"/ip address add address=172.16.{ip_mik[12:]}.1/24 interface=ether2 network=172.16.{ip_mik[12:]}.0",
         "/ip firewall nat add action=masquerade chain=srcnat out-interface=ether1",
-        "/ip pool add name=dhcp_pool0 ranges=172.16.7.11-172.16.7.100",
-        "/ip dhcp-server add address-pool=dhcp_pool0 disabled=no interface=ether2 lease-time=30m name=LAN",
-        "/ip dhcp-server network add address=172.16.7.0/24 dns-server=192.168.100.1 gateway=172.16.7.1",
+        f"/ip pool add name=LAN ranges=172.16.{ip_mik[12:]}.11-172.16.{ip_mik[12:]}.100",
+        "/ip dhcp-server add address-pool=LAN disabled=no interface=ether2 lease-time=30m name=LAN",
+        f"/ip dhcp-server network add address=172.16.{ip_mik[12:]}.0/24 dns-server={ip_gate[:13]} gateway=172.16.{ip_mik[12:]}.1",
         "/ip neighbor discovery-settings set discover-interface-list=none",
         "/system ntp client set enabled=yes primary-ntp=202.162.32.12",
         "/system clock set time-zone-name=Asia/Jakarta",
@@ -50,9 +54,10 @@ def config():
     #Konfigurasi router klien
     for config in config_list:
         ssh_client.exec_command(config)
-        time.sleep(0.2)
         print (config)
-
+        time.sleep(0.2)
+       
+    
     return jsonify(data)
 
 @app.route("/")
