@@ -63,8 +63,9 @@ def config():
 def indexku():
     file_open = open ("template/ip_address.txt","r")
     baca_file = file_open.readlines()
+    baca_file1 = set(baca_file)
 
-    return render_template ("index.html", var=baca_file)  
+    return render_template ("index.html", var=baca_file1)  
 
 
 
